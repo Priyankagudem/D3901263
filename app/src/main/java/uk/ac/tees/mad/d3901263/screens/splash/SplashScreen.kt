@@ -36,6 +36,7 @@ import kotlinx.coroutines.launch
 import uk.ac.tees.mad.d3901263.R.raw
 import uk.ac.tees.mad.d3901263.R.string
 import uk.ac.tees.mad.d3901263.navigation.NavigationDestination
+import uk.ac.tees.mad.d3901263.screens.OnboardingDestination
 import uk.ac.tees.mad.d3901263.screens.homescreen.HomeDestination
 import uk.ac.tees.mad.d3901263.ui.theme.primaryPink
 import uk.ac.tees.mad.d3901263.ui.theme.smokeWhite
@@ -47,7 +48,7 @@ object SplashDestination : NavigationDestination {
 }
 
 @Composable
-fun SplashScreen(navController: NavHostController) {
+fun SplashScreen(onFinish: () -> Unit) {
 
     val animation = remember {
         Animatable(0f)
@@ -56,16 +57,13 @@ fun SplashScreen(navController: NavHostController) {
     LaunchedEffect(key1 = true) {
         animation.animateTo(1f, animationSpec = tween(1500))
         delay(2000L)
-        launch(Dispatchers.Main) {
-            navController.popBackStack()
-            navController.navigate(HomeDestination.route)
-        }
+        onFinish()
     }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(smokeWhite),
+            .background(Color.White),
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -106,16 +104,16 @@ fun SplashScreen(navController: NavHostController) {
             )
             Spacer(modifier = Modifier.weight(0.5f))
         }
-
     }
 }
 
 @Composable
-fun LoaderAnimation(modifier: Modifier, anim: Int) {
+fun LoaderAnimation(modifier: Modifier, anim: Int, iterations: Int = 1) {
     val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(anim))
 
     LottieAnimation(
         composition = composition,
         modifier = modifier,
+        iterations = iterations
     )
 }

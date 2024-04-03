@@ -24,9 +24,10 @@ private val DarkColorScheme = darkColorScheme(
 
 private val LightColorScheme = lightColorScheme(
     primary = primaryPink,
-    secondary = PurpleGrey40,
-    tertiary = Pink40,
-    background = smokeWhite,
+    secondary = lightGrey,
+    onSecondary = darkGrey,
+    tertiary = smokeWhite,
+    background = Color.White,
 
     /* Other default colors to override
     surface = Color(0xFFFFFBFE),
@@ -58,7 +59,7 @@ fun BeautyAppointmentTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = smokeWhite.toArgb()
+            window.statusBarColor = Color.White.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
         }
     }

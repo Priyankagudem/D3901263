@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Beauty Appointment</string>
+    <string name="onboarding">Onboarding</string>
 </resources>

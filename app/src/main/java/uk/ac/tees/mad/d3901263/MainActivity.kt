@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import uk.ac.tees.mad.d3901263.navigation.BeautyAppointmentNav
+import uk.ac.tees.mad.d3901263.screens.homescreen.HomeScreen
 import uk.ac.tees.mad.d3901263.ui.theme.BeautyAppointmentTheme
 
 class MainActivity : ComponentActivity() {
