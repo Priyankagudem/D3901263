@@ -46,6 +46,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import uk.ac.tees.mad.d3901263.R
 import uk.ac.tees.mad.d3901263.navigation.NavigationDestination
+import uk.ac.tees.mad.d3901263.screens.authentication.LoginDestination
 import uk.ac.tees.mad.d3901263.screens.homescreen.HomeDestination
 import uk.ac.tees.mad.d3901263.screens.splash.LoaderAnimation
 import uk.ac.tees.mad.d3901263.ui.theme.primaryPink
@@ -92,7 +93,7 @@ fun OnboardingScreen(navController: NavHostController) {
                 color = primaryPink,
                 modifier = Modifier.clickable {
                     onOnboardingFinish(context)
-                    navController.navigate(HomeDestination.route)
+                    navController.navigate(LoginDestination.route)
                 }
             )
         }
@@ -171,7 +172,7 @@ fun OnboardingScreen(navController: NavHostController) {
                         scope.launch(Dispatchers.Main) {
                             onOnboardingFinish(context)
                             navController.popBackStack()
-                            navController.navigate(HomeDestination.route)
+                            navController.navigate(LoginDestination.route)
                         }
                     } else {
                         scope.launch {

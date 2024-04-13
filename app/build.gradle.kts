@@ -1,6 +1,18 @@
+import java.io.FileInputStream
+import java.util.Properties
+
+val propertyFile = rootProject.file("apiKey.properties")
+val apiKeyProperties = Properties()
+apiKeyProperties.load(
+    FileInputStream(propertyFile)
+)
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    id("com.google.gms.google-services")
+    id("dagger.hilt.android.plugin")
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -18,6 +30,11 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        buildConfigField(
+            "String",
+            "AUTH_CLIENT_KEY",
+            apiKeyProperties.getProperty("AUTH_CLIENT_KEY")
+        )
     }
 
     buildTypes {
@@ -38,6 +55,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -66,6 +84,26 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.7")
     //shared preference
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+    //Accompanist: for permission handling
+    implementation("com.google.accompanist:accompanist-permissions:0.35.0-alpha")
+
+    //Dagger - Hilt
+    implementation("com.google.dagger:hilt-android:2.47")
+    implementation(libs.play.services.auth)
+    ksp("com.google.dagger:hilt-compiler:2.47")
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+
+    //Coil
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
+    //Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.7.3"))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.firestore.ktx)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

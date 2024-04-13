@@ -28,6 +28,7 @@ import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.Timelapse
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -85,7 +86,7 @@ data class Service(
 )
 
 @Composable
-fun HomeScreen(/*navController: NavHostController*/) {
+fun HomeScreen(/*navController: NavHostController*/ onSignOut: () -> Unit) {
     Column(
         Modifier
             .fillMaxSize()
@@ -134,6 +135,10 @@ fun HomeScreen(/*navController: NavHostController*/) {
                 SalonItemCard(salon = salon)
             }
             item {
+                // TODO: Just for testing
+                Button(onClick = onSignOut) {
+                    Text(text = "Sign out")
+                }
                 Spacer(modifier = Modifier.height(20.dp))
             }
         }
@@ -192,7 +197,9 @@ fun SalonItemCard(salon: Salon) {
                         Icon(
                             painterResource(id = R.drawable.heart),
                             contentDescription = "Favorite",
-                            Modifier.padding(10.dp).align(Alignment.Center)
+                            Modifier
+                                .padding(10.dp)
+                                .align(Alignment.Center)
                         )
                     }
                     Spacer(modifier = Modifier.weight(1f))
