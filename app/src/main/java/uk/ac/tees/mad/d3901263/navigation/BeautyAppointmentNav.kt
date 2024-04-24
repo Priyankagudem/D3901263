@@ -5,24 +5,24 @@ import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import uk.ac.tees.mad.d3901263.screens.OnboardingDestination
+import uk.ac.tees.mad.d3901263.screens.Onboarding
 import uk.ac.tees.mad.d3901263.screens.OnboardingScreen
-import uk.ac.tees.mad.d3901263.screens.authentication.LoginDestination
+import uk.ac.tees.mad.d3901263.screens.authentication.Login
 import uk.ac.tees.mad.d3901263.screens.authentication.LoginScreen
-import uk.ac.tees.mad.d3901263.screens.authentication.RegisterDestination
+import uk.ac.tees.mad.d3901263.screens.authentication.Register
 import uk.ac.tees.mad.d3901263.screens.authentication.RegisterScreen
-import uk.ac.tees.mad.d3901263.screens.homescreen.HomeDestination
+import uk.ac.tees.mad.d3901263.screens.homescreen.Home
 import uk.ac.tees.mad.d3901263.screens.homescreen.HomeScreen
-import uk.ac.tees.mad.d3901263.screens.splash.SplashDestination
+import uk.ac.tees.mad.d3901263.screens.salondetail.SalonDetail
+import uk.ac.tees.mad.d3901263.screens.salondetail.SalonDetailDestination
+import uk.ac.tees.mad.d3901263.screens.splash.Splash
 import uk.ac.tees.mad.d3901263.screens.splash.SplashScreen
 
 @Composable
@@ -36,15 +36,15 @@ fun BeautyAppointmentNav() {
 
     val destinationScreen =
         if (isOnboardingFinished(context) && currentUser != null) {
-            HomeDestination.route
+            Home.route
         } else if (isOnboardingFinished(context) && currentUser == null) {
-            LoginDestination.route
+            Login.route
         } else {
-            OnboardingDestination.route
+            Onboarding.route
         }
 
-    NavHost(navController = navController, startDestination = SplashDestination.route) {
-        composable(SplashDestination.route) {
+    NavHost(navController = navController, startDestination = Splash.route) {
+        composable(Splash.route) {
             SplashScreen(
                 onFinish = {
                     navController.popBackStack()
@@ -52,36 +52,49 @@ fun BeautyAppointmentNav() {
                 }
             )
         }
-        composable(OnboardingDestination.route) {
+        composable(Onboarding.route) {
             OnboardingScreen(navController = navController)
         }
-        composable(HomeDestination.route) {
-            HomeScreen(onSignOut = {
-                scope.launch {
-                    firebaseAuth.signOut()
-                    context.makeToast("Sign out success")
-                    delay(500L)
-                    navController.navigate(LoginDestination.route)
+        composable(Home.route) {
+            HomeScreen(
+//                onSignOut = {
+//                    scope.launch {
+//                        firebaseAuth.signOut()
+//                        context.makeToast("Sign out success")
+//                        delay(500L)
+//                        navController.navigate(Login.route)
+//                    }
+//                },
+                onItemClick = {
+                    navController.navigate(SalonDetailDestination.route + "/" + it)
                 }
-            })
+            )
         }
 
-        composable(LoginDestination.route) {
+        composable(Login.route) {
             LoginScreen(
                 onLoginComplete = {
                     context.makeToast("Login success")
-                    navController.navigate(HomeDestination.route)
+                    navController.navigate(Home.route)
                 },
-                onRegisterClick = { navController.navigate(RegisterDestination.route) })
+                onRegisterClick = { navController.navigate(Register.route) })
         }
 
-        composable(RegisterDestination.route) {
+        composable(Register.route) {
             RegisterScreen(
                 onRegisterComplete = {
                     context.makeToast("Register success")
-                    navController.navigate(HomeDestination.route)
+                    navController.navigate(Home.route)
                 },
-                onLoginClick = { navController.navigate(LoginDestination.route) })
+                onLoginClick = { navController.navigate(Login.route) })
+        }
+        composable(
+            route = SalonDetailDestination.routeWithArgs,
+            arguments = listOf(navArgument(SalonDetailDestination.salonIdArg) {
+                type = NavType.StringType
+            })
+        ) {
+            SalonDetail(onBack = { navController.navigateUp() })
         }
     }
 }
@@ -97,7 +110,7 @@ fun Context.makeToast(text: String) {
 }
 
 
-interface NavigationDestination {
+interface Navigation {
     val route: String
     val titleRes: Int
 }

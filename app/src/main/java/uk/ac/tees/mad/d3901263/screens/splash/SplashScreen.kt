@@ -26,23 +26,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import uk.ac.tees.mad.d3901263.R.raw
 import uk.ac.tees.mad.d3901263.R.string
-import uk.ac.tees.mad.d3901263.navigation.NavigationDestination
-import uk.ac.tees.mad.d3901263.screens.OnboardingDestination
-import uk.ac.tees.mad.d3901263.screens.homescreen.HomeDestination
+import uk.ac.tees.mad.d3901263.navigation.Navigation
 import uk.ac.tees.mad.d3901263.ui.theme.primaryPink
-import uk.ac.tees.mad.d3901263.ui.theme.smokeWhite
 
 
-object SplashDestination : NavigationDestination {
+object Splash : Navigation {
     override val route = "splash"
     override val titleRes: Int = string.app_name
 }

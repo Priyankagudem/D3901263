@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -34,7 +33,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -45,9 +43,8 @@ import com.airbnb.lottie.compose.LottieConstants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import uk.ac.tees.mad.d3901263.R
-import uk.ac.tees.mad.d3901263.navigation.NavigationDestination
-import uk.ac.tees.mad.d3901263.screens.authentication.LoginDestination
-import uk.ac.tees.mad.d3901263.screens.homescreen.HomeDestination
+import uk.ac.tees.mad.d3901263.navigation.Navigation
+import uk.ac.tees.mad.d3901263.screens.authentication.Login
 import uk.ac.tees.mad.d3901263.screens.splash.LoaderAnimation
 import uk.ac.tees.mad.d3901263.ui.theme.primaryPink
 import uk.ac.tees.mad.d3901263.ui.theme.smokeWhite
@@ -93,7 +90,7 @@ fun OnboardingScreen(navController: NavHostController) {
                 color = primaryPink,
                 modifier = Modifier.clickable {
                     onOnboardingFinish(context)
-                    navController.navigate(LoginDestination.route)
+                    navController.navigate(Login.route)
                 }
             )
         }
@@ -172,7 +169,7 @@ fun OnboardingScreen(navController: NavHostController) {
                         scope.launch(Dispatchers.Main) {
                             onOnboardingFinish(context)
                             navController.popBackStack()
-                            navController.navigate(LoginDestination.route)
+                            navController.navigate(Login.route)
                         }
                     } else {
                         scope.launch {
@@ -237,7 +234,7 @@ private fun onOnboardingFinish(context: Context) {
     editor.putBoolean("isFinished", true).apply()
 }
 
-object OnboardingDestination : NavigationDestination {
+object Onboarding : Navigation {
     override val route = "onboarding"
     override val titleRes: Int = R.string.onboarding
 }

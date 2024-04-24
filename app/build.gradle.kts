@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         applicationId = "uk.ac.tees.mad.d3901263"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -91,6 +91,7 @@ dependencies {
     //Dagger - Hilt
     implementation("com.google.dagger:hilt-android:2.47")
     implementation(libs.play.services.auth)
+    implementation(libs.play.services.location)
     ksp("com.google.dagger:hilt-compiler:2.47")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
 

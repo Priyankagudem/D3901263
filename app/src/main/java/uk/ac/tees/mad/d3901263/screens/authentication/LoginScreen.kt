@@ -62,7 +62,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 import uk.ac.tees.mad.d3901263.R
-import uk.ac.tees.mad.d3901263.navigation.NavigationDestination
+import uk.ac.tees.mad.d3901263.navigation.Navigation
 import uk.ac.tees.mad.d3901263.repository.GoogleAuthClient
 import uk.ac.tees.mad.d3901263.screens.authentication.viewmodel.AuthenticationViewModel
 import uk.ac.tees.mad.d3901263.ui.theme.smokeWhite
@@ -315,7 +315,7 @@ fun LoginScreen(
     }
 }
 
-object LoginDestination : NavigationDestination {
+object Login : Navigation {
     override val route: String
         get() = "login"
 

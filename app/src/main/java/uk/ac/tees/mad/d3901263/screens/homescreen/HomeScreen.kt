@@ -1,7 +1,11 @@
 package uk.ac.tees.mad.d3901263.screens.homescreen
 
+import android.Manifest
+import android.location.Location
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,10 +32,9 @@ import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.Timelapse
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -39,17 +42,34 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import uk.ac.tees.mad.d3901263.ApplicationViewModel
+import uk.ac.tees.mad.d3901263.LocationRepository
 import uk.ac.tees.mad.d3901263.R
-import uk.ac.tees.mad.d3901263.navigation.NavigationDestination
+import uk.ac.tees.mad.d3901263.domain.Salon
+import uk.ac.tees.mad.d3901263.navigation.Navigation
+import uk.ac.tees.mad.d3901263.screens.homescreen.viewmodel.HomeViewModel
+import uk.ac.tees.mad.d3901263.ui.theme.primaryPink
 import uk.ac.tees.mad.d3901263.ui.theme.smokeWhite
 
 /*  Home Screen:
@@ -86,7 +106,34 @@ data class Service(
 )
 
 @Composable
-fun HomeScreen(/*navController: NavHostController*/ onSignOut: () -> Unit) {
+fun HomeScreen(onItemClick: (String) -> Unit) {
+    val viewModel: HomeViewModel = hiltViewModel()
+    val salonListStatus by viewModel.salonListStatus.collectAsState(initial = null)
+    var salonList by remember {
+        mutableStateOf<List<Salon>>(emptyList())
+    }
+
+    LaunchedEffect(salonListStatus?.isSuccess) {
+        salonListStatus?.isSuccess?.let {
+            salonList = it
+        }
+    }
+
+    var searchValue by remember {
+        mutableStateOf("")
+    }
+
+    LaunchedEffect(searchValue) {
+        salonList = if (searchValue.isNotEmpty()) {
+            viewModel.salonList.filter { sal ->
+                sal.name.lowercase().contains(searchValue.lowercase())
+            }
+        } else {
+            viewModel.salonList
+        }
+        println(salonList)
+    }
+
     Column(
         Modifier
             .fillMaxSize()
@@ -103,7 +150,13 @@ fun HomeScreen(/*navController: NavHostController*/ onSignOut: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             item {
-                SearchRow()
+                SearchRow(
+                    onValueChange = {
+                        searchValue = it
+
+                    },
+                    searchValue = searchValue
+                )
 
                 Spacer(modifier = Modifier.height(20.dp))
 
@@ -130,16 +183,14 @@ fun HomeScreen(/*navController: NavHostController*/ onSignOut: () -> Unit) {
                     )
                 }
             }
-
-            items(SalonList) { salon ->
-                SalonItemCard(salon = salon)
-            }
-            item {
-                // TODO: Just for testing
-                Button(onClick = onSignOut) {
-                    Text(text = "Sign out")
+            if (salonListStatus?.isLoading == true) {
+                item {
+                    CircularProgressIndicator()
                 }
-                Spacer(modifier = Modifier.height(20.dp))
+            } else {
+                items(salonList) { salon ->
+                    SalonItemCard(salon = salon, onClick = { onItemClick(salon.id) })
+                }
             }
         }
 
@@ -158,28 +209,28 @@ fun ServiceRow() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SalonItemCard(salon: Salon) {
+fun SalonItemCard(salon: Salon, onClick: () -> Unit) {
     Card(
-        onClick = {},
+        onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primary.copy(
-                alpha = 0.2f
+            containerColor = primaryPink.copy(
+                alpha = 0.5f
             )
         ),
-        elevation = CardDefaults.cardElevation(2.dp)
+        elevation = CardDefaults.outlinedCardElevation(2.dp)
     ) {
         Box(
             modifier = Modifier
                 .height(250.dp)
         ) {
-            Image(
-                painter = painterResource(id = salon.imageRes),
-                contentDescription = "",
-                modifier = Modifier.fillMaxWidth(),
-                contentScale = ContentScale.FillWidth
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current).crossfade(true)
+                    .data(salon.imageUrl).build(),
+                contentDescription = "Salon image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxWidth()
             )
             Row(
                 Modifier
@@ -239,7 +290,7 @@ fun SalonItemCard(salon: Salon) {
                 Icon(
                     imageVector = Icons.Rounded.LocationOn,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = primaryPink
                 )
                 Text(text = salon.address, modifier = Modifier.padding(4.dp))
             }
@@ -247,16 +298,22 @@ fun SalonItemCard(salon: Salon) {
                 Icon(
                     imageVector = Icons.Rounded.Timelapse,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = primaryPink
                 )
-                Text(text = salon.timing, modifier = Modifier.padding(4.dp))
+                Text(
+                    text = "${salon.openTiming}-${salon.closeTiming}",
+                    modifier = Modifier.padding(4.dp)
+                )
             }
         }
     }
 }
 
 @Composable
-fun SearchRow() {
+fun SearchRow(
+    onValueChange: (String) -> Unit,
+    searchValue: String
+) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -266,9 +323,8 @@ fun SearchRow() {
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight(),
-            value = "",
-            onValueChange = {},
-            enabled = false,
+            value = searchValue,
+            onValueChange = onValueChange,
             placeholder = {
                 Text(text = "Search Salon, Specialist...")
             },
@@ -276,9 +332,10 @@ fun SearchRow() {
                 Icon(
                     imageVector = Icons.Default.Search,
                     contentDescription = "search",
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = primaryPink
                 )
-            }
+            },
+            singleLine = true
         )
         Spacer(modifier = Modifier.width(12.dp))
         Box(
@@ -286,7 +343,7 @@ fun SearchRow() {
                 .fillMaxHeight()
                 .aspectRatio(1f)
                 .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.primary)
+                .background(primaryPink)
         ) {
             Icon(
                 imageVector = Icons.Default.FilterList,
@@ -305,7 +362,7 @@ fun ServiceIconBox(service: Service) {
             modifier = Modifier
                 .size(80.dp)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
+                .background(primaryPink.copy(alpha = 0.2f))
         ) {
             Image(
                 painter = painterResource(id = service.iconRes),
@@ -320,8 +377,54 @@ fun ServiceIconBox(service: Service) {
     }
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun HomeHeader() {
+fun HomeHeader(
+
+) {
+    val context = LocalContext.current
+    val applicationViewModel: ApplicationViewModel = hiltViewModel()
+    val locationPermissions = listOf(
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_FINE_LOCATION,
+    )
+    val locationPermissionsState = rememberMultiplePermissionsState(
+        locationPermissions
+    )
+    val activity = (context as ComponentActivity)
+    val locationManager = LocationRepository(context, activity)
+    val isGpsEnabled = locationManager.gpsStatus.collectAsState(initial = false)
+    val location = Location("MyLocationProvider")
+
+    val locationState =
+        applicationViewModel.locationFlow.collectAsState(
+            initial = location.apply {
+                latitude = 51.509865
+                longitude = -0.118092
+            }
+        )
+    var locationValue by remember {
+        mutableStateOf("London, UK")
+    }
+    LaunchedEffect(Unit) {
+        if (locationPermissionsState.allPermissionsGranted) {
+            if (!isGpsEnabled.value) {
+                locationManager.checkGpsSettings()
+                println("Not enabled")
+            } else {
+                locationValue = locationManager.getAddressFromCoordinate(
+                    latitude = locationState.value.latitude,
+                    longitude = locationState.value.longitude
+                )
+                println("enabled ${locationValue}")
+
+            }
+        } else {
+            println("Permisson not got")
+
+            locationPermissionsState.launchMultiplePermissionRequest()
+        }
+    }
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -333,14 +436,31 @@ fun HomeHeader() {
                 modifier = Modifier.padding(6.dp),
                 color = MaterialTheme.colorScheme.secondary
             )
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable {
+                if (locationPermissionsState.allPermissionsGranted) {
+                    if (!isGpsEnabled.value) {
+                        locationManager.checkGpsSettings()
+                        println("Not enabled")
+                    } else {
+                        locationValue = locationManager.getAddressFromCoordinate(
+                            latitude = locationState.value.latitude,
+                            longitude = locationState.value.longitude
+                        )
+
+                    }
+                } else {
+                    println("Permisson not got")
+
+                    locationPermissionsState.launchMultiplePermissionRequest()
+                }
+            }) {
                 Icon(
                     imageVector = Icons.Rounded.LocationOn,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = primaryPink
                 )
                 Text(
-                    text = "New Delhi, India",
+                    text = locationValue,
                     color = Color.Black,
                     fontSize = 18.sp,
                     modifier = Modifier.padding(horizontal = 6.dp)
@@ -365,53 +485,53 @@ fun HomeHeader() {
     }
 }
 
-object HomeDestination : NavigationDestination {
+object Home : Navigation {
     override val route = "home"
     override val titleRes: Int = R.string.app_name
 }
-
-data class Salon(
-    val name: String,
-    val address: String,
-    val rating: Double,
-    val imageRes: Int,
-    val timing: String
-)
-
-val SalonList = listOf<Salon>(
-    Salon(
-        name = "Glamour Heaven",
-        address = "Sector-51, Noida",
-        rating = 4.5,
-        imageRes = R.drawable.salon1,
-        timing = "10am - 11pm"
-    ),
-    Salon(
-        name = "Glamour Heaven",
-        address = "Sector-51, Noida",
-        rating = 4.5,
-        imageRes = R.drawable.salon2,
-        timing = "10am - 11pm"
-    ),
-    Salon(
-        name = "Glamour Heaven",
-        address = "Sector-51, Noida",
-        rating = 4.5,
-        imageRes = R.drawable.salon3,
-        timing = "10am - 11pm"
-    ),
-    Salon(
-        name = "Glamour Heaven",
-        address = "Sector-51, Noida",
-        rating = 4.5,
-        imageRes = R.drawable.salon2,
-        timing = "10am - 11pm"
-    ),
-    Salon(
-        name = "Glamour Heaven",
-        address = "Sector-51, Noida",
-        rating = 4.5,
-        imageRes = R.drawable.salon1,
-        timing = "10am - 11pm"
-    ),
-)
+//
+//data class Salon(
+//    val name: String,
+//    val address: String,
+//    val rating: Double,
+//    val imageRes: Int,
+//    val timing: String
+//)
+//
+//val SalonList = listOf<Salon>(
+//    Salon(
+//        name = "Glamour Heaven",
+//        address = "Sector-51, Noida",
+//        rating = 4.5,
+//        imageRes = R.drawable.salon1,
+//        timing = "10am - 11pm"
+//    ),
+//    Salon(
+//        name = "Glamour Heaven",
+//        address = "Sector-51, Noida",
+//        rating = 4.5,
+//        imageRes = R.drawable.salon2,
+//        timing = "10am - 11pm"
+//    ),
+//    Salon(
+//        name = "Glamour Heaven",
+//        address = "Sector-51, Noida",
+//        rating = 4.5,
+//        imageRes = R.drawable.salon3,
+//        timing = "10am - 11pm"
+//    ),
+//    Salon(
+//        name = "Glamour Heaven",
+//        address = "Sector-51, Noida",
+//        rating = 4.5,
+//        imageRes = R.drawable.salon2,
+//        timing = "10am - 11pm"
+//    ),
+//    Salon(
+//        name = "Glamour Heaven",
+//        address = "Sector-51, Noida",
+//        rating = 4.5,
+//        imageRes = R.drawable.salon1,
+//        timing = "10am - 11pm"
+//    ),
+//)

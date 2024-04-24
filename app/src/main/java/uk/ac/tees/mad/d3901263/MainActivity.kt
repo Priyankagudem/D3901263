@@ -6,13 +6,10 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import dagger.hilt.android.AndroidEntryPoint
 import uk.ac.tees.mad.d3901263.navigation.BeautyAppointmentNav
-import uk.ac.tees.mad.d3901263.screens.homescreen.HomeScreen
+import uk.ac.tees.mad.d3901263.screens.salondetail.SalonDetail
 import uk.ac.tees.mad.d3901263.ui.theme.BeautyAppointmentTheme
 
 @AndroidEntryPoint
@@ -27,6 +24,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     BeautyAppointmentNav()
+
                 }
             }
         }

@@ -8,6 +8,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import uk.ac.tees.mad.d3901263.repository.AuthRepository
 import uk.ac.tees.mad.d3901263.repository.AuthRepositoryIMPL
+import uk.ac.tees.mad.d3901263.repository.FirestoreRepository
+import uk.ac.tees.mad.d3901263.repository.FirestoreRepositoryIMPL
 import javax.inject.Singleton
 
 @Module
@@ -28,6 +30,11 @@ object AppModule {
         firestore: FirebaseFirestore
     ): AuthRepository =
         AuthRepositoryIMPL(firebaseAuth, firestore)
+
+    @Provides
+    @Singleton
+    fun providesFirestoreRepository(): FirestoreRepository =
+        FirestoreRepositoryIMPL()
 
 
 }
