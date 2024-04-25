@@ -12,14 +12,24 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import uk.ac.tees.mad.d3901263.screens.Onboarding
 import uk.ac.tees.mad.d3901263.screens.OnboardingScreen
+import uk.ac.tees.mad.d3901263.screens.appointmenthistory.AppointmentHistory
+import uk.ac.tees.mad.d3901263.screens.appointmenthistory.AppointmentHistoryScreen
 import uk.ac.tees.mad.d3901263.screens.authentication.Login
 import uk.ac.tees.mad.d3901263.screens.authentication.LoginScreen
 import uk.ac.tees.mad.d3901263.screens.authentication.Register
 import uk.ac.tees.mad.d3901263.screens.authentication.RegisterScreen
 import uk.ac.tees.mad.d3901263.screens.homescreen.Home
 import uk.ac.tees.mad.d3901263.screens.homescreen.HomeScreen
+import uk.ac.tees.mad.d3901263.screens.liked.LikedItem
+import uk.ac.tees.mad.d3901263.screens.liked.LikedItemScreen
+import uk.ac.tees.mad.d3901263.screens.profile.EditProfile
+import uk.ac.tees.mad.d3901263.screens.profile.EditProfileScreen
+import uk.ac.tees.mad.d3901263.screens.profile.Profile
+import uk.ac.tees.mad.d3901263.screens.profile.ProfileScreen
 import uk.ac.tees.mad.d3901263.screens.salondetail.SalonDetail
 import uk.ac.tees.mad.d3901263.screens.salondetail.SalonDetailDestination
 import uk.ac.tees.mad.d3901263.screens.splash.Splash
@@ -57,16 +67,11 @@ fun BeautyAppointmentNav() {
         }
         composable(Home.route) {
             HomeScreen(
-//                onSignOut = {
-//                    scope.launch {
-//                        firebaseAuth.signOut()
-//                        context.makeToast("Sign out success")
-//                        delay(500L)
-//                        navController.navigate(Login.route)
-//                    }
-//                },
                 onItemClick = {
                     navController.navigate(SalonDetailDestination.route + "/" + it)
+                },
+                onProfileClick = {
+                    navController.navigate(Profile.route)
                 }
             )
         }
@@ -90,11 +95,40 @@ fun BeautyAppointmentNav() {
         }
         composable(
             route = SalonDetailDestination.routeWithArgs,
-            arguments = listOf(navArgument(SalonDetailDestination.salonIdArg) {
-                type = NavType.StringType
-            })
+            arguments = listOf(
+                navArgument(SalonDetailDestination.salonIdArg) {
+                    type = NavType.StringType
+                }
+            )
         ) {
             SalonDetail(onBack = { navController.navigateUp() })
+        }
+
+        composable(Profile.route) {
+            ProfileScreen(
+                navController = navController,
+                logout = {
+                    scope.launch {
+                        firebaseAuth.signOut()
+                        context.makeToast("Sign out success")
+                        delay(500L)
+                        navController.navigate(Login.route)
+                    }
+                }
+            )
+        }
+
+        composable(EditProfile.route) {
+            EditProfileScreen(
+                onBack = { navController.navigateUp() }
+            )
+        }
+
+        composable(AppointmentHistory.route) {
+            AppointmentHistoryScreen(onBack = { navController.navigateUp() })
+        }
+        composable(LikedItem.route) {
+            LikedItemScreen(onBack = { navController.navigateUp() })
         }
     }
 }

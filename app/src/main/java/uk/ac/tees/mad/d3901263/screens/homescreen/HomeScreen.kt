@@ -26,7 +26,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.LocationOn
@@ -106,7 +106,7 @@ data class Service(
 )
 
 @Composable
-fun HomeScreen(onItemClick: (String) -> Unit) {
+fun HomeScreen(onItemClick: (String) -> Unit, onProfileClick: () -> Unit) {
     val viewModel: HomeViewModel = hiltViewModel()
     val salonListStatus by viewModel.salonListStatus.collectAsState(initial = null)
     var salonList by remember {
@@ -141,7 +141,7 @@ fun HomeScreen(onItemClick: (String) -> Unit) {
             .background(Color.White)
     ) {
 
-        HomeHeader()
+        HomeHeader(onProfileClick = onProfileClick)
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -380,7 +380,7 @@ fun ServiceIconBox(service: Service) {
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun HomeHeader(
-
+    onProfileClick: () -> Unit
 ) {
     val context = LocalContext.current
     val applicationViewModel: ApplicationViewModel = hiltViewModel()
@@ -405,25 +405,6 @@ fun HomeHeader(
         )
     var locationValue by remember {
         mutableStateOf("London, UK")
-    }
-    LaunchedEffect(Unit) {
-        if (locationPermissionsState.allPermissionsGranted) {
-            if (!isGpsEnabled.value) {
-                locationManager.checkGpsSettings()
-                println("Not enabled")
-            } else {
-                locationValue = locationManager.getAddressFromCoordinate(
-                    latitude = locationState.value.latitude,
-                    longitude = locationState.value.longitude
-                )
-                println("enabled ${locationValue}")
-
-            }
-        } else {
-            println("Permisson not got")
-
-            locationPermissionsState.launchMultiplePermissionRequest()
-        }
     }
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -473,12 +454,12 @@ fun HomeHeader(
             }
         }
         IconButton(
-            onClick = { /*TODO*/ },
+            onClick = onProfileClick,
             colors = IconButtonDefaults.iconButtonColors(containerColor = MaterialTheme.colorScheme.tertiary),
             modifier = Modifier.clip(CircleShape)
         ) {
             Icon(
-                imageVector = Icons.Default.Notifications,
+                imageVector = Icons.Default.Person,
                 contentDescription = "Notification"
             )
         }
