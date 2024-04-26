@@ -3,6 +3,7 @@ package uk.ac.tees.mad.d3901263.screens.profile
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,17 +29,25 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import uk.ac.tees.mad.d3901263.R
+import uk.ac.tees.mad.d3901263.domain.FirestoreUser
 import uk.ac.tees.mad.d3901263.navigation.Navigation
 import uk.ac.tees.mad.d3901263.screens.appointmenthistory.AppointmentHistory
 import uk.ac.tees.mad.d3901263.screens.liked.LikedItem
@@ -52,6 +61,13 @@ fun ProfileScreen(
     navController: NavHostController,
     logout: () -> Unit
 ) {
+    val profileViewModel: ProfileViewModel = hiltViewModel()
+    val getUserState by profileViewModel.currentUserState.collectAsState(initial = null)
+    val user = getUserState?.data?.item
+    LaunchedEffect(Unit) {
+        profileViewModel.getUserInformation()
+    }
+
     Column(
         Modifier
             .fillMaxSize()
@@ -64,7 +80,7 @@ fun ProfileScreen(
             title = "Profile"
         )
         Spacer(modifier = Modifier.height(20.dp))
-        ProfileCard(onClick = {})
+        ProfileCard(onClick = {}, user = user)
         ProfileItem(
             text = "Your profile",
             iconVector = Icons.Outlined.PersonOutline,
@@ -103,7 +119,13 @@ fun ProfileItem(
     Spacer(modifier = Modifier.height(16.dp))
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(44.dp)
+            .clickable {
+                onClick()
+            }
+
     ) {
         Icon(
             imageVector = iconVector,
@@ -114,13 +136,13 @@ fun ProfileItem(
         Spacer(modifier = Modifier.width(16.dp))
         Text(text = text, fontSize = 18.sp)
         Spacer(modifier = Modifier.weight(1f))
-        IconButton(onClick = onClick) {
-            Icon(
-                imageVector = Icons.Default.ChevronRight,
-                contentDescription = null,
-                tint = primaryPink
-            )
-        }
+        Icon(
+            imageVector = Icons.Default.ChevronRight,
+            contentDescription = null,
+            tint = primaryPink
+        )
+
+
     }
 }
 
@@ -142,7 +164,8 @@ fun ProfileHeader(
 
 @Composable
 fun ProfileCard(
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    user: FirestoreUser.UserDetail?
 ) {
     Row(
         Modifier
@@ -157,30 +180,35 @@ fun ProfileCard(
                 .padding(12.dp)
                 .clip(CircleShape)
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.salon1),
-                contentDescription = null,
-                contentScale = ContentScale.Crop
-            )
-//            AsyncImage(
-//                model = ImageRequest
-//                    .Builder(LocalContext.current)
-//                    .crossfade(true)
-//                    .data(R.drawable.salon1),
-//                contentDescription = null,
-//                contentScale = ContentScale.Crop
-//            )
+            if (user?.image == null) {
+
+                Image(
+                    painter = painterResource(id = R.drawable.salon1),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                AsyncImage(
+                    model = ImageRequest
+                        .Builder(LocalContext.current)
+                        .crossfade(true)
+                        .data(user.image)
+                        .build(),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop
+                )
+            }
         }
         Spacer(modifier = Modifier.width(12.dp))
         Column {
             Text(
-                text = "Profile name",
+                text = "${user?.name}",
                 color = smokeWhite,
                 fontWeight = FontWeight.Medium,
                 fontSize = 20.sp
             )
             Spacer(modifier = Modifier.height(6.dp))
-            Text(text = "Email", color = smokeWhite, fontSize = 16.sp)
+            Text(text = "${user?.email}", color = smokeWhite, fontSize = 16.sp)
         }
         Spacer(modifier = Modifier.weight(1f))
         IconButton(onClick = onClick) {
