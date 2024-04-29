@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import uk.ac.tees.mad.d3901263.domain.Resource
 import uk.ac.tees.mad.d3901263.domain.Salon
+import uk.ac.tees.mad.d3901263.domain.SalonAppointment
 
 
 class FirestoreRepositoryIMPL : FirestoreRepository {
@@ -113,6 +114,43 @@ class FirestoreRepositoryIMPL : FirestoreRepository {
             e.printStackTrace()
             trySend(Resource.Success("Booking failed"))
             println("Failed to book appointment: ${e.message}")
+        }
+        awaitClose { close() }
+    }
+
+
+    override fun getUserAppointments(userId: String): Flow<Resource<List<SalonAppointment>>> = callbackFlow {
+        trySend(Resource.Loading())
+        val db = FirebaseFirestore.getInstance()
+        try {
+            val documents = db.collection("appointments")
+                .whereEqualTo("userId", userId)
+                .get()
+                .await()
+
+            val appointments = documents.documents.mapNotNull { doc ->
+                try {
+                    val data = doc.data
+                    val salonId = data?.get("salonId") as String
+                    val salonDocument = db.collection("salons").document(salonId).get().await()
+                    val salonData = salonDocument.data
+                    if (salonData != null) {
+                        SalonAppointment(
+                            appointmentId = doc.id,
+                            salonName = salonData["name"] as String? ?: "Unknown Salon",
+                            salonAddress = salonData["address"] as String? ?: "Unknown Address",
+                            slot = data["selectedSlot"] as String,
+                            customerName = data["userName"] as String,
+                            customerEmail = data["userEmail"] as String
+                        )
+                    } else null
+                } catch (e: Exception) {
+                    null
+                }
+            }
+            trySend(Resource.Success(appointments))
+        } catch (exception: Exception) {
+            trySend(Resource.Error(exception.message ?: "Unknown error"))
         }
         awaitClose { close() }
     }
