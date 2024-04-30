@@ -25,9 +25,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material.icons.rounded.Star
@@ -69,6 +71,7 @@ import uk.ac.tees.mad.d3901263.R
 import uk.ac.tees.mad.d3901263.domain.Salon
 import uk.ac.tees.mad.d3901263.navigation.Navigation
 import uk.ac.tees.mad.d3901263.screens.homescreen.viewmodel.HomeViewModel
+import uk.ac.tees.mad.d3901263.ui.theme.darkGrey
 import uk.ac.tees.mad.d3901263.ui.theme.primaryPink
 import uk.ac.tees.mad.d3901263.ui.theme.smokeWhite
 
@@ -112,7 +115,7 @@ fun HomeScreen(onItemClick: (String) -> Unit, onProfileClick: () -> Unit) {
     var salonList by remember {
         mutableStateOf<List<Salon>>(emptyList())
     }
-
+    val context = LocalContext.current
     LaunchedEffect(salonListStatus?.isSuccess) {
         salonListStatus?.isSuccess?.let {
             salonList = it
@@ -189,7 +192,13 @@ fun HomeScreen(onItemClick: (String) -> Unit, onProfileClick: () -> Unit) {
                 }
             } else {
                 items(salonList) { salon ->
-                    SalonItemCard(salon = salon, onClick = { onItemClick(salon.id) })
+                    SalonItemCard(
+                        salon = salon,
+                        onClick = { onItemClick(salon.id) },
+                        onLike = {
+                            viewModel.addItemToFavorite(salon, context)
+                        }
+                    )
                 }
             }
         }
@@ -210,7 +219,7 @@ fun ServiceRow() {
 }
 
 @Composable
-fun SalonItemCard(salon: Salon, onClick: () -> Unit) {
+fun SalonItemCard(salon: Salon, onClick: () -> Unit, onLike: () -> Unit, unLike: Boolean = false) {
     Card(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
@@ -243,12 +252,16 @@ fun SalonItemCard(salon: Salon, onClick: () -> Unit) {
                         modifier = Modifier
                             .clip(CircleShape)
                             .size(50.dp)
-                            .background(smokeWhite.copy(alpha = 0.9f))
+                            .background(if (unLike) primaryPink else smokeWhite.copy(alpha = 0.9f))
+                            .clickable {
+                                onLike()
+                            }
                     ) {
                         Icon(
-                            painterResource(id = R.drawable.heart),
+                            imageVector = Icons.Default.FavoriteBorder,
                             contentDescription = "Favorite",
-                            Modifier
+                            tint = if (unLike) smokeWhite else darkGrey,
+                            modifier = Modifier
                                 .padding(10.dp)
                                 .align(Alignment.Center)
                         )
@@ -459,8 +472,8 @@ fun HomeHeader(
             modifier = Modifier.clip(CircleShape)
         ) {
             Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = "Notification"
+                imageVector = Icons.Default.Settings,
+                contentDescription = "Settings"
             )
         }
     }

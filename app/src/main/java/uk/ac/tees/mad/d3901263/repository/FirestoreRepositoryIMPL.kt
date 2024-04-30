@@ -119,39 +119,80 @@ class FirestoreRepositoryIMPL : FirestoreRepository {
     }
 
 
-    override fun getUserAppointments(userId: String): Flow<Resource<List<SalonAppointment>>> = callbackFlow {
-        trySend(Resource.Loading())
-        val db = FirebaseFirestore.getInstance()
-        try {
-            val documents = db.collection("appointments")
-                .whereEqualTo("userId", userId)
-                .get()
-                .await()
+    override fun getUserAppointments(userId: String): Flow<Resource<List<SalonAppointment>>> =
+        callbackFlow {
+            trySend(Resource.Loading())
+            val db = FirebaseFirestore.getInstance()
+            try {
+                val documents = db.collection("appointments")
+                    .whereEqualTo("userId", userId)
+                    .get()
+                    .await()
 
-            val appointments = documents.documents.mapNotNull { doc ->
-                try {
-                    val data = doc.data
-                    val salonId = data?.get("salonId") as String
-                    val salonDocument = db.collection("salons").document(salonId).get().await()
-                    val salonData = salonDocument.data
-                    if (salonData != null) {
-                        SalonAppointment(
-                            appointmentId = doc.id,
-                            salonName = salonData["name"] as String? ?: "Unknown Salon",
-                            salonAddress = salonData["address"] as String? ?: "Unknown Address",
-                            slot = data["selectedSlot"] as String,
-                            customerName = data["userName"] as String,
-                            customerEmail = data["userEmail"] as String
-                        )
-                    } else null
-                } catch (e: Exception) {
-                    null
+                val appointments = documents.documents.mapNotNull { doc ->
+                    try {
+                        val data = doc.data
+                        val salonId = data?.get("salonId") as String
+                        val salonDocument = db.collection("salons").document(salonId).get().await()
+                        val salonData = salonDocument.data
+                        if (salonData != null) {
+                            SalonAppointment(
+                                appointmentId = doc.id,
+                                salonName = salonData["name"] as String? ?: "Unknown Salon",
+                                salonAddress = salonData["address"] as String? ?: "Unknown Address",
+                                slot = data["selectedSlot"] as String,
+                                customerName = data["userName"] as String,
+                                customerEmail = data["userEmail"] as String
+                            )
+                        } else null
+                    } catch (e: Exception) {
+                        null
+                    }
                 }
+                trySend(Resource.Success(appointments))
+            } catch (exception: Exception) {
+                trySend(Resource.Error(exception.message ?: "Unknown error"))
             }
-            trySend(Resource.Success(appointments))
-        } catch (exception: Exception) {
-            trySend(Resource.Error(exception.message ?: "Unknown error"))
+            awaitClose { close() }
         }
-        awaitClose { close() }
-    }
+
+    override fun getSalonListByKey(keyList: List<String>): Flow<Resource<List<Salon>>> =
+        callbackFlow {
+            trySend(Resource.Loading())
+            try {
+                val responseList = mutableListOf<Salon>()
+                for (key in keyList) {
+                    val document =
+                        FirebaseFirestore.getInstance().collection("salons").document(key)
+                            .get().await()
+                    if (document.exists()) {
+                        val data = document.data
+                        responseList.add(
+                            Salon(
+                                id = document.id,
+                                name = data?.get("name") as String? ?: "Unknown Salon",
+                                address = data?.get("address") as String? ?: "Unknown Address",
+                                rating = (data?.get("rating") as Number?)?.toDouble() ?: 0.0,
+                                imageUrl = data?.get("imageUrl") as String?
+                                    ?: "https://example.com/default_image.jpg",
+                                openTiming = data?.get("openingTime") as String? ?: "9:00",
+                                closeTiming = data?.get("closingTime") as String? ?: "18:00",
+                                servicesOffered = (data?.get("services") as List<String>?)
+                                    ?: listOf("General Service"),
+                                priceRange = data?.get("priceRange") as String? ?: "$0 - $0",
+                                slotDuration = (data?.get("slotDuration") as Number?)?.toInt()
+                                    ?: 30,
+                                description = data?.get("description") as String?
+                                    ?: "Unknown Salon Description"
+                            )
+                        )
+                    }
+                }
+                trySend(Resource.Success(responseList))
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+                trySend(Resource.Error("Error fetching Salons"))
+            }
+            awaitClose { close() }
+        }
 }

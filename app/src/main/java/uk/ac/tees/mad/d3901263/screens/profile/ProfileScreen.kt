@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.PersonOutline
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -38,7 +39,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -77,7 +77,7 @@ fun ProfileScreen(
             onBack = {
                 navController.navigateUp()
             },
-            title = "Profile"
+            title = "Settings"
         )
         Spacer(modifier = Modifier.height(20.dp))
         ProfileCard(onClick = {}, user = user)
@@ -183,7 +183,7 @@ fun ProfileCard(
             if (user?.image == null) {
 
                 Image(
-                    painter = painterResource(id = R.drawable.salon1),
+                    imageVector = Icons.Rounded.Person,
                     contentDescription = null,
                     contentScale = ContentScale.Crop
                 )

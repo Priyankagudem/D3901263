@@ -1,6 +1,8 @@
 package uk.ac.tees.mad.d3901263.screens.homescreen.viewmodel
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -10,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import uk.ac.tees.mad.d3901263.database.LikedItemRepository
 import uk.ac.tees.mad.d3901263.domain.Resource
 import uk.ac.tees.mad.d3901263.domain.Salon
 import uk.ac.tees.mad.d3901263.repository.FirestoreRepository
@@ -17,7 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val firestoreRepository: FirestoreRepository
+    private val firestoreRepository: FirestoreRepository,
+    private val likedItemRepository: LikedItemRepository
 ) : ViewModel() {
 
     private val _salonListStatus = Channel<ResponseStatus>()
@@ -50,6 +54,12 @@ class HomeViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun addItemToFavorite(salon: Salon, context: Context) = viewModelScope.launch {
+        likedItemRepository.addToLiked(salon)
+    }.invokeOnCompletion {
+        Toast.makeText(context, "Added to liked", Toast.LENGTH_SHORT).show()
     }
 }
 

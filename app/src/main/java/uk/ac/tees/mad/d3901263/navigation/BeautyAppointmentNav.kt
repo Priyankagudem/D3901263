@@ -128,7 +128,12 @@ fun BeautyAppointmentNav() {
             AppointmentHistoryScreen(onBack = { navController.navigateUp() })
         }
         composable(LikedItem.route) {
-            LikedItemScreen(onBack = { navController.navigateUp() })
+            LikedItemScreen(
+                onBack = { navController.navigateUp() },
+                onItemClick = {
+                    navController.navigate(SalonDetailDestination.route + "/" + it)
+                }
+            )
         }
     }
 }

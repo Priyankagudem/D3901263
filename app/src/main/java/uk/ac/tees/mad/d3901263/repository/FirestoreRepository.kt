@@ -13,6 +13,10 @@ interface FirestoreRepository {
         userId: String,
         selectedSlot: String
     ): Flow<Resource<String>>
+
     fun getUserAppointments(userId: String): Flow<Resource<List<SalonAppointment>>>
+    fun getSalonListByKey(
+        keyList: List<String>
+    ): Flow<Resource<List<Salon>>>
 
 }
