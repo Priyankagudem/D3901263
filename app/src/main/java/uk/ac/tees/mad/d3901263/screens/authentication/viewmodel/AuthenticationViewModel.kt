@@ -40,19 +40,11 @@ class AuthenticationViewModel @Inject constructor(
     private val _loginStatus = Channel<LoginStatus>()
     val loginState = _loginStatus.receiveAsFlow()
 
-    private val _googleLoginResult = MutableStateFlow(LoginResult())
-    val googleLoginResult = _googleLoginResult.asStateFlow()
-
     private val _signupUiState = MutableStateFlow(RegisterUiState())
     val registerUiState = _signupUiState.asStateFlow()
 
     private val _registerState = Channel<RegisterState>()
     val registerState = _registerState.receiveAsFlow()
-
-    fun resetState() {
-        _state.update { LoginState() }
-        _googleLoginResult.update { LoginResult() }
-    }
 
     fun updateLoginState(value: LoginUiState) {
         _loginUiState.value = value

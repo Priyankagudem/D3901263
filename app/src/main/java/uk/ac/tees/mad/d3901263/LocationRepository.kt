@@ -77,8 +77,8 @@ class LocationRepository(private val context: Context, private val activity: Act
     ): String {
         val geocoder = Geocoder(context, Locale.getDefault())
         val addresses: List<Address>? = geocoder.getFromLocation(latitude, longitude, 1)
-        val city: String = addresses?.get(0)?.locality ?: "London"
-        val country: String = addresses?.get(0)?.countryName ?: "UK"
+        val city: String = addresses?.get(0)?.locality ?: "Unknown"
+        val country: String = addresses?.get(0)?.countryName ?: ""
         return "$city, $country"
     }
 }

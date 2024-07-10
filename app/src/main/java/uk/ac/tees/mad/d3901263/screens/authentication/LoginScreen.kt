@@ -1,13 +1,7 @@
 package uk.ac.tees.mad.d3901263.screens.authentication
 
-import android.app.Activity
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,8 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -47,10 +39,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -59,11 +49,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 import uk.ac.tees.mad.d3901263.R
 import uk.ac.tees.mad.d3901263.navigation.Navigation
-import uk.ac.tees.mad.d3901263.repository.GoogleAuthClient
 import uk.ac.tees.mad.d3901263.screens.authentication.viewmodel.AuthenticationViewModel
 import uk.ac.tees.mad.d3901263.ui.theme.smokeWhite
 
@@ -80,25 +68,8 @@ fun LoginScreen(
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val googleAuthUiClient by lazy {
-        GoogleAuthClient(
-            oneTapClient = Identity.getSignInClient(context)
-        )
-    }
 
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartIntentSenderForResult(),
-        onResult = { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                scope.launch {
-                    val loginResult = googleAuthUiClient.signInWithIntent(
-                        intent = result.data ?: return@launch
-                    )
-                    viewModel.onLoginWithGoogleResult(loginResult)
-                }
-            }
-        }
-    )
+
     Column(
         Modifier
             .fillMaxSize()
@@ -211,50 +182,7 @@ fun LoginScreen(
                 Text(text = "Login", fontSize = 18.sp)
             }
         }
-        Spacer(modifier = Modifier.height(56.dp))
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .height(1.dp)
-                    .background(smokeWhite)
-            )
-            Text(text = "or Login with")
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .height(1.dp)
-                    .background(smokeWhite)
-            )
-        }
-        Spacer(modifier = Modifier.height(56.dp))
-        IconButton(
-            onClick = {
-                scope.launch {
-                    val loginIntentSender = googleAuthUiClient.signIn()
-                    launcher.launch(
-                        IntentSenderRequest
-                            .Builder(
-                                loginIntentSender ?: return@launch
-                            )
-                            .build()
-                    )
-                }
-            },
-            modifier = Modifier
-                .border(BorderStroke(1.dp, Color.Gray), CircleShape)
-                .padding(5.dp)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_google),
-                contentDescription = "Sign with google",
-                tint = Color.Unspecified,
-                modifier = Modifier.size(32.dp)
-            )
-        }
+
         Spacer(modifier = Modifier.weight(1f))
         Row(
             Modifier.fillMaxWidth(),
@@ -288,21 +216,6 @@ fun LoginScreen(
                 val error = loginStatus.value?.isError
                 Toast.makeText(context, "$error", Toast.LENGTH_LONG).show()
             }
-        }
-    }
-    LaunchedEffect(key1 = loginState.isLoginSuccessful) {
-        if (loginState.isLoginSuccessful) {
-            Toast.makeText(
-                context,
-                "Sign in successful",
-                Toast.LENGTH_LONG
-            ).show()
-            val user = googleAuthUiClient.getSignedInUser()
-            if (user != null) {
-                viewModel.saveUserInFirestore(user)
-            }
-            viewModel.resetState()
-            onLoginComplete()
         }
     }
     LaunchedEffect(key1 = loginState.loginError) {

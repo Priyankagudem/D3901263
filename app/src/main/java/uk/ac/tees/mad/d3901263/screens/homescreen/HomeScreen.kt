@@ -417,7 +417,7 @@ fun HomeHeader(
             }
         )
     var locationValue by remember {
-        mutableStateOf("London, UK")
+        mutableStateOf("Select Location")
     }
     Row(
         modifier = Modifier.fillMaxWidth(),
