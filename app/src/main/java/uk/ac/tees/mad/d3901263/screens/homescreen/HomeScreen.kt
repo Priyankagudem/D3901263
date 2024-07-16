@@ -161,19 +161,19 @@ fun HomeScreen(onItemClick: (String) -> Unit, onProfileClick: () -> Unit) {
                     searchValue = searchValue
                 )
 
-                Spacer(modifier = Modifier.height(20.dp))
+//                Spacer(modifier = Modifier.height(20.dp))
 
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Row {
-                        Text(
-                            text = "Services",
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(10.dp))
-                    ServiceRow()
-                }
+//                Column(modifier = Modifier.fillMaxWidth()) {
+//                    Row {
+//                        Text(
+//                            text = "Services",
+//                            fontSize = 24.sp,
+//                            fontWeight = FontWeight.Bold
+//                        )
+//                    }
+//                    Spacer(modifier = Modifier.height(10.dp))
+//                    ServiceRow()
+//                }
 
                 Spacer(modifier = Modifier.height(20.dp))
 
@@ -472,7 +472,7 @@ fun HomeHeader(
             modifier = Modifier.clip(CircleShape)
         ) {
             Icon(
-                imageVector = Icons.Default.Settings,
+                imageVector = Icons.Default.Person,
                 contentDescription = "Settings"
             )
         }
@@ -483,49 +483,3 @@ object Home : Navigation {
     override val route = "home"
     override val titleRes: Int = R.string.app_name
 }
-//
-//data class Salon(
-//    val name: String,
-//    val address: String,
-//    val rating: Double,
-//    val imageRes: Int,
-//    val timing: String
-//)
-//
-//val SalonList = listOf<Salon>(
-//    Salon(
-//        name = "Glamour Heaven",
-//        address = "Sector-51, Noida",
-//        rating = 4.5,
-//        imageRes = R.drawable.salon1,
-//        timing = "10am - 11pm"
-//    ),
-//    Salon(
-//        name = "Glamour Heaven",
-//        address = "Sector-51, Noida",
-//        rating = 4.5,
-//        imageRes = R.drawable.salon2,
-//        timing = "10am - 11pm"
-//    ),
-//    Salon(
-//        name = "Glamour Heaven",
-//        address = "Sector-51, Noida",
-//        rating = 4.5,
-//        imageRes = R.drawable.salon3,
-//        timing = "10am - 11pm"
-//    ),
-//    Salon(
-//        name = "Glamour Heaven",
-//        address = "Sector-51, Noida",
-//        rating = 4.5,
-//        imageRes = R.drawable.salon2,
-//        timing = "10am - 11pm"
-//    ),
-//    Salon(
-//        name = "Glamour Heaven",
-//        address = "Sector-51, Noida",
-//        rating = 4.5,
-//        imageRes = R.drawable.salon1,
-//        timing = "10am - 11pm"
-//    ),
-//)
