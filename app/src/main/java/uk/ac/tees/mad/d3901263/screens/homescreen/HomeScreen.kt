@@ -5,6 +5,7 @@ import android.location.Location
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,6 +38,7 @@ import androidx.compose.material.icons.rounded.Timelapse
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -222,17 +224,17 @@ fun ServiceRow() {
 fun SalonItemCard(salon: Salon, onClick: () -> Unit, onLike: () -> Unit, unLike: Boolean = false) {
     Card(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, primaryPink, RoundedCornerShape(8.dp)),
         colors = CardDefaults.cardColors(
-            containerColor = primaryPink.copy(
-                alpha = 0.5f
-            )
+            containerColor = Color.Transparent
         ),
-        elevation = CardDefaults.outlinedCardElevation(2.dp)
     ) {
         Box(
             modifier = Modifier
                 .height(250.dp)
+
         ) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current).crossfade(true)
@@ -252,7 +254,7 @@ fun SalonItemCard(salon: Salon, onClick: () -> Unit, onLike: () -> Unit, unLike:
                         modifier = Modifier
                             .clip(CircleShape)
                             .size(50.dp)
-                            .background(if (unLike) primaryPink else smokeWhite.copy(alpha = 0.9f))
+                            .background(if (unLike) primaryPink else Color.White.copy(alpha = 0.9f))
                             .clickable {
                                 onLike()
                             }
@@ -285,6 +287,7 @@ fun SalonItemCard(salon: Salon, onClick: () -> Unit, onLike: () -> Unit, unLike:
                 }
             }
         }
+        HorizontalDivider(color = primaryPink)
         Text(
             text = salon.name,
             modifier = Modifier.padding(start = 12.dp, top = 6.dp),
@@ -292,12 +295,10 @@ fun SalonItemCard(salon: Salon, onClick: () -> Unit, onLike: () -> Unit, unLike:
             fontWeight = FontWeight.Bold
         )
 
-        Row(
+        Column(
             Modifier
                 .padding(start = 12.dp, bottom = 4.dp, end = 12.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .fillMaxWidth()
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
