@@ -6,8 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -23,12 +21,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.rounded.AlternateEmail
-import androidx.compose.material.icons.rounded.Call
 import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.Timelapse
-import androidx.compose.material.icons.rounded.Web
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -68,7 +63,6 @@ import uk.ac.tees.mad.d3901263.ui.theme.darkGrey
 import uk.ac.tees.mad.d3901263.ui.theme.primaryPink
 import uk.ac.tees.mad.d3901263.ui.theme.smokeWhite
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SalonDetail(
     onBack: () -> Unit
@@ -210,7 +204,6 @@ fun SalonDetail(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SalonDetailComponent(
     salon: Salon?,
@@ -247,73 +240,6 @@ fun SalonDetailComponent(
             )
         }
 
-        Row(
-            Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(
-                    modifier = Modifier
-                        .size(50.dp)
-                        .clip(CircleShape)
-                        .background(primaryPink.copy(alpha = 0.2f))
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Web,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .align(Alignment.Center),
-                        tint = primaryPink
-                    )
-                }
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(text = "Website", fontWeight = FontWeight.Medium)
-            }
-            Spacer(modifier = Modifier.width(16.dp))
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(
-                    modifier = Modifier
-                        .size(50.dp)
-                        .clip(CircleShape)
-                        .background(primaryPink.copy(alpha = 0.2f))
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Call,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .align(Alignment.Center),
-                        tint = primaryPink
-                    )
-                }
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(text = "Call", fontWeight = FontWeight.Medium)
-            }
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(
-                    modifier = Modifier
-                        .size(50.dp)
-                        .clip(CircleShape)
-                        .background(primaryPink.copy(alpha = 0.2f))
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.AlternateEmail,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .align(Alignment.Center),
-                        tint = primaryPink
-                    )
-                }
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(text = "Email", fontWeight = FontWeight.Medium)
-            }
-        }
-
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
@@ -322,27 +248,22 @@ fun SalonDetailComponent(
             fontSize = 18.sp
         )
         Spacer(modifier = Modifier.height(12.dp))
-        FlowRow(
+        Column(
             modifier = Modifier
                 .weight(1f)
-                .fillMaxWidth()
+                .fillMaxWidth(),
+
         ) {
-            salon?.servicesOffered?.forEach {
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(smokeWhite),
-                    contentAlignment = Alignment.Center
-                ) {
+            salon?.servicesOffered?.forEachIndexed { index, s ->
+
                     Text(
-                        text = it,
+                        text = "${index+1}. $s",
                         fontSize = 16.sp,
                         color = darkGrey,
                         modifier = Modifier
                             .padding(horizontal = 12.dp, vertical = 8.dp)
                     )
-                }
-                Spacer(modifier = Modifier.width(16.dp))
+
             }
         }
 
