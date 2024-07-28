@@ -76,7 +76,7 @@ class AuthRepositoryIMPL @Inject constructor(
                             val userResponse = FirestoreUser(
                                 key = currentUserUid,
                                 item = FirestoreUser.UserDetail(
-                                    name = data["username"] as String? ?: "",
+                                    name = data["name"] as String? ?: "",
                                     email = data["email"] as String? ?: "",
                                     phone = data["phone"] as String? ?: "",
                                     dob = data["dob"] as String? ?: "",
@@ -107,6 +107,7 @@ class AuthRepositoryIMPL @Inject constructor(
     override fun updateCurrentUser(item: UserDetailUiState): Flow<Resource<String>> =
         callbackFlow {
             trySend(Resource.Loading())
+            Log.d("UPDATE", "UPDATE USER INVOKED")
             val currentUserUid = firebaseAuth.currentUser?.uid
 
             val storage = Firebase.storage.reference
@@ -127,9 +128,11 @@ class AuthRepositoryIMPL @Inject constructor(
                     if (currentUserUid != null) {
                         firebaseFirestore.collection("users")
                             .document(currentUserUid)
-                            .update(map)
+                            .set(map)
                             .addOnCompleteListener {
                                 if (it.isSuccessful) {
+                                    Log.d("UPDATE", "$map")
+
                                     trySend(Resource.Success("Updated Successfully.."))
                                 }
                             }

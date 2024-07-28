@@ -331,12 +331,13 @@ fun SearchRow(
     Row(
         Modifier
             .fillMaxWidth()
-            .height(50.dp)
+//            .height(50.dp),
+        ,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         OutlinedTextField(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
+                .weight(1f),
             value = searchValue,
             onValueChange = onValueChange,
             placeholder = {
@@ -349,13 +350,13 @@ fun SearchRow(
                     tint = primaryPink
                 )
             },
-            singleLine = true
+            singleLine = true,
+            shape = RoundedCornerShape(8.dp)
         )
         Spacer(modifier = Modifier.width(12.dp))
         Box(
             modifier = Modifier
-                .fillMaxHeight()
-                .aspectRatio(1f)
+                .size(56.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(primaryPink)
         ) {

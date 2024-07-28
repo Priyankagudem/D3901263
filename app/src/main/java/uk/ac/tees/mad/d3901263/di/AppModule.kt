@@ -18,6 +18,7 @@ import uk.ac.tees.mad.d3901263.repository.FirestoreRepository
 import uk.ac.tees.mad.d3901263.repository.FirestoreRepositoryIMPL
 import javax.inject.Singleton
 
+//Dagger Hilt
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {

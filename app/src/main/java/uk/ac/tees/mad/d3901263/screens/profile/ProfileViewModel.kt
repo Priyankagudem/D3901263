@@ -9,6 +9,8 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -64,6 +66,8 @@ class ProfileViewModel @Inject constructor(
 
                 is Resource.Success -> {
                     _currentUserState.send(FirestoreUserState(data = it.data))
+                    Log.d("UPDATEddffd", "${it.data}, uid = ${Firebase.auth.currentUser?.uid}")
+
                     launch(Dispatchers.IO) {
                         _profileUiState.update { state ->
                             val item = it.data?.item
@@ -95,6 +99,7 @@ class ProfileViewModel @Inject constructor(
 
                 is Resource.Success -> {
                     _userUpdateState.send(UpdateResponseState(data = it.data))
+                    getUserInformation()
                 }
             }
         }

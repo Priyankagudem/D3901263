@@ -161,32 +161,34 @@ fun EditProfileScreen(
             ) {
                 UploadPhoto(onClick = { showBottomSheet = true }, image = uiState.image)
                 Spacer(modifier = Modifier.height(24.dp))
-                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    TextFieldComponent(
-                        label = "Name",
-                        text = uiState.name,
-                        onChange = { profileViewModel.updateProfileUiState(uiState.copy(name = it)) },
-                        focusManager = focusManager
+                Column() {
+
+                    Text(text = "Name")
+                    Spacer(modifier = Modifier.height(6.dp))
+                    OutlinedTextField(
+                        value = uiState.name,
+                        onValueChange = { profileViewModel.updateProfileUiState(uiState.copy(name = it)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        maxLines = 1,
+                        colors = TextFieldDefaults.colors(
+
+                        ),
+                        placeholder = {
+                            Text(text = "Name")
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = {
+                                focusManager.moveFocus(FocusDirection.Down)
+                            },
+                            onDone = {
+                                focusManager.clearFocus()
+                            }
+                        )
                     )
-                    TextFieldComponent(
-                        label = "Phone Number",
-                        text = uiState.phone,
-                        onChange = { profileViewModel.updateProfileUiState(uiState.copy(phone = it)) },
-                        focusManager = focusManager
-                    )
-                    TextFieldComponent(
-                        label = "Date of Birth",
-                        text = uiState.dob,
-                        onChange = { profileViewModel.updateProfileUiState(uiState.copy(dob = it)) },
-                        focusManager = focusManager
-                    )
-                    TextFieldComponent(
-                        label = "Gender",
-                        text = uiState.gender,
-                        onChange = { profileViewModel.updateProfileUiState(uiState.copy(gender = it)) },
-                        focusManager = focusManager,
-                        isLastField = true
-                    )
+
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 Button(
@@ -211,44 +213,6 @@ fun EditProfileScreen(
                 Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
             }
         }
-    }
-
-}
-
-@Composable
-fun TextFieldComponent(
-    label: String,
-    text: String,
-    onChange: (String) -> Unit,
-    isLastField: Boolean = false,
-    focusManager: FocusManager
-) {
-    Column {
-        Text(text = label)
-        Spacer(modifier = Modifier.height(6.dp))
-        OutlinedTextField(
-            value = text,
-            onValueChange = onChange,
-            modifier = Modifier.fillMaxWidth(),
-            maxLines = 1,
-            colors = TextFieldDefaults.colors(
-
-            ),
-            placeholder = {
-                Text(text = label)
-            },
-            keyboardOptions = KeyboardOptions(
-                imeAction = if (isLastField) ImeAction.Done else ImeAction.Next
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = {
-                    focusManager.moveFocus(FocusDirection.Down)
-                },
-                onDone = {
-                    focusManager.clearFocus()
-                }
-            )
-        )
     }
 }
 

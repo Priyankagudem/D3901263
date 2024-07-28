@@ -24,10 +24,13 @@ import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.PersonOutline
 import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -55,6 +58,7 @@ import uk.ac.tees.mad.d3901263.ui.theme.darkGrey
 import uk.ac.tees.mad.d3901263.ui.theme.lightGrey
 import uk.ac.tees.mad.d3901263.ui.theme.primaryPink
 import uk.ac.tees.mad.d3901263.ui.theme.smokeWhite
+import kotlin.math.log
 
 @Composable
 fun ProfileScreen(
@@ -102,11 +106,14 @@ fun ProfileScreen(
                 navController.navigate(LikedItem.route)
             }
         )
-        ProfileItem(
-            text = "Log out",
-            iconVector = Icons.AutoMirrored.Outlined.Logout,
-            onClick = logout
-        )
+        Spacer(modifier = Modifier.weight(1f))
+        Button(
+            modifier = Modifier.fillMaxWidth().height(60.dp),
+            onClick = logout,
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+        ) {
+            Text(text = "Log out", color = MaterialTheme.colorScheme.error)
+        }
     }
 }
 
