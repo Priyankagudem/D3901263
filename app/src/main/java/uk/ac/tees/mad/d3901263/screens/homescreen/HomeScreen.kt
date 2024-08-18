@@ -113,6 +113,7 @@ data class Service(
 @Composable
 fun HomeScreen(onItemClick: (String) -> Unit, onProfileClick: () -> Unit) {
     val viewModel: HomeViewModel = hiltViewModel()
+    val likedSalonList = viewModel.likedSalonList.collectAsState()
     val salonListStatus by viewModel.salonListStatus.collectAsState(initial = null)
     var salonList by remember {
         mutableStateOf<List<Salon>>(emptyList())
@@ -194,12 +195,18 @@ fun HomeScreen(onItemClick: (String) -> Unit, onProfileClick: () -> Unit) {
                 }
             } else {
                 items(salonList) { salon ->
+                    val isLiked = likedSalonList.value.contains(salon.id)
                     SalonItemCard(
                         salon = salon,
                         onClick = { onItemClick(salon.id) },
                         onLike = {
-                            viewModel.addItemToFavorite(salon, context)
-                        }
+                            if (isLiked) {
+                                viewModel.removeFromFavorite(salon, context)
+                            } else {
+                                viewModel.addItemToFavorite(salon, context)
+                            }
+                        },
+                        unLike = isLiked
                     )
                 }
             }

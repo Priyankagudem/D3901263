@@ -10,8 +10,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import uk.ac.tees.mad.d3901263.database.LikedItemEntity
 import uk.ac.tees.mad.d3901263.database.LikedItemRepository
 import uk.ac.tees.mad.d3901263.domain.Resource
 import uk.ac.tees.mad.d3901263.domain.Salon
@@ -27,11 +31,15 @@ class HomeViewModel @Inject constructor(
     private val _salonListStatus = Channel<ResponseStatus>()
     val salonListStatus = _salonListStatus.receiveAsFlow()
 
+    private val _likedSalonList = MutableStateFlow(listOf<String>())
+    val likedSalonList = _likedSalonList.asStateFlow()
+
     var salonList by mutableStateOf(listOf<Salon>())
         private set
 
     init {
         getAllSalonList()
+        getAllFavorite()
     }
 
     private fun getAllSalonList() = viewModelScope.launch {
@@ -60,6 +68,21 @@ class HomeViewModel @Inject constructor(
         likedItemRepository.addToLiked(salon)
     }.invokeOnCompletion {
         Toast.makeText(context, "Added to liked", Toast.LENGTH_SHORT).show()
+    }
+
+    fun removeFromFavorite(salon: Salon, context: Context) = viewModelScope.launch {
+        likedItemRepository.deleteFromLiked(salon)
+    }.invokeOnCompletion {
+        Toast.makeText(context, "Removed from liked", Toast.LENGTH_SHORT).show()
+    }
+
+    fun getAllFavorite() = viewModelScope.launch {
+        likedItemRepository.getAllLiked().collect { result ->
+            _likedSalonList.value = result.map { res ->
+                res.itemId
+            }
+        }
+
     }
 }
 
